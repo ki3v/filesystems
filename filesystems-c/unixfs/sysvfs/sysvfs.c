@@ -187,12 +187,11 @@ detect_sysv(struct sysv_sb_info* sbi, struct buffer_head* bh)
     //      return type;
     //  }
 
-    // XXX: plexus - the above commented code is obnoxious.
- 
     sbi->s_type = FSTYPE_SYSV2;			// HACK: plexus force SVR2
     printk( "on-disk type: %d\n", type );	// HACK: plexus force SVR2
     return 2;					// HACK: plexus force 1024-byte blocks
 
+    // XXX: KI3V - the code below is obnoxious and not helpful for identifying SVR2 filesystems in the real world
 
     if (fs32_to_host(sbi->s_bytesex, sbd->s_time) < JAN_1_1980) {
         /* this is likely to happen on SystemV2 FS */
