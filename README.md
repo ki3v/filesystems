@@ -4,7 +4,7 @@ These are hacks against the macOS-modified versions of these FUSE filesystems.
 
 This is not a general-purpose fork.  This has ugly experimental hacks to allow loading an odd Plexus-specific SVR2 fs flavor (and to build on modern macOS).  These hacks will break the ability to work with non-Plexus filesystems.
 
-This is based primarily on this filesystem information from the <sys/filsys.h> header on the Plexus filesystem:
+This is based primarily on this filesystem information from the <sys/filsys.h> header on the Plexus filesystem (note this is a version edited by me to note offsets and what's nonstandard... in particular the `ADJUST to make sizeof filsys be 512` comment, which is original and not my edit, was not followed and that's partially why this suberblock format is non-standard... s_magic is in the wrong place and the order is also slightly wrong ):
 
 ```
 /* SID @(#)filsys.h.1.1 */
