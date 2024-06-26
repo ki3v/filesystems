@@ -1,1 +1,6 @@
 .DS_Store
+.vscode
+*.img
+*.hex
+bsave
+filesystems-c/unixfs/sysvfs/hack.diff

@@ -74,14 +74,14 @@ static inline int
 sysv_namecompare(int len, int maxlen, const char* name, const char* buffer)
 {
     if (len < maxlen && buffer[len])
-        return 0;
+	return 0;
     return !memcmp(name, buffer, len);
 }
 
 static inline unsigned long
 sysv_dir_pages(struct inode* inode)
 {
-        return (inode->I_size + PAGE_CACHE_SIZE - 1) >> PAGE_CACHE_SHIFT;
+	return (inode->I_size + PAGE_CACHE_SIZE - 1) >> PAGE_CACHE_SHIFT;
 }
 
 struct sysv_sb_info { /* in memory */
@@ -91,7 +91,7 @@ struct sysv_sb_info { /* in memory */
     int  s_type;     /* file system type: FSTYPE_{XENIX|SYSV|COH} */
     char s_bytesex;  /* bytesex (le/be/pdp) */
     char s_truncate; /* if 1: names > SYSV_NAMELEN chars are truncated */
-                     /* if 0: they are disallowed (ENAMETOOLONG) */
+		     /* if 0: they are disallowed (ENAMETOOLONG) */
 
     nlink_t      s_link_max;              /* max # of hard links to a file */
     unsigned int s_inodes_per_block;      /* # of inodes per block */
@@ -140,20 +140,20 @@ static inline void
 sysv_read3byte(struct sysv_sb_info* sbi, unsigned char* from, unsigned char* to)
 {
     if (sbi->s_bytesex == UNIXFS_FS_PDP) {
-        to[0] = from[0];
-        to[1] = 0;
-        to[2] = from[1];
-        to[3] = from[2];
+	to[0] = from[0];
+	to[1] = 0;
+	to[2] = from[1];
+	to[3] = from[2];
     } else if (sbi->s_bytesex == UNIXFS_FS_LITTLE) {
-        to[0] = from[0];
-        to[1] = from[1];
-        to[2] = from[2];
-        to[3] = 0;
+	to[0] = from[0];
+	to[1] = from[1];
+	to[2] = from[2];
+	to[3] = 0;
     } else {
-        to[0] = 0;
-        to[1] = from[0];
-        to[2] = from[1];
-        to[3] = from[2];
+	to[0] = 0;
+	to[1] = from[0];
+	to[2] = from[1];
+	to[3] = from[2];
     }
 }
 
@@ -211,10 +211,10 @@ struct xenix_super_block { /* on disk */
     char        s_fill[371];
     s32         s_magic;    /* version of file system */
     __fs32      s_type   ;  /* type of file system:
-                               1 for 512 byte blocks 
-                               2 for 1024 byte blocks
-                               3 for 2048 byte blocks */
-                                
+			       1 for 512 byte blocks 
+			       2 for 1024 byte blocks
+			       3 for 2048 byte blocks */
+				
 };
 
 /*
@@ -255,8 +255,8 @@ struct sysv4_super_block {  /* on disk */
     __fs32      s_state;    /* state: 0x7c269d38-s_time means it is clean */
     s32         s_magic;    /* version of file system */
     __fs32      s_type;     /* type of file system:
-                                1 for 512 byte blocks
-                                2 for 1024 byte blocks */
+				1 for 512 byte blocks
+				2 for 1024 byte blocks */
 };
 
 struct sysv2_super_block {    /* on disk */
@@ -276,12 +276,15 @@ struct sysv2_super_block {    /* on disk */
     __fs16      s_tinode;     /* total number of free inodes */
     char        s_fname[6];   /* file system volume name */
     char        s_fpack[6];   /* file system pack name */
-    s32         s_fill[14];
-    __fs32      s_state;      /* file system state: 0xcb096f43 means clean */
+//     s32         s_fill[14];
+//     __fs32      s_state;      /* file system state: 0xcb096f43 means clean */
+    s32         s_fill[13];	// HACK: plexus changed order/packing in svr2 filsys.h
     s32         s_magic;      /* version of file system */
     __fs32      s_type;       /* type of file system:
-                                 1 for 512 byte blocks
-                                 2 for 1024 byte blocks */
+				 1 for 512 byte blocks
+				 2 for 1024 byte blocks */
+    __fs32      s_state;      /* file system state: 0xcb096f43 means clean */
+    __fs32      s_fill2[1];      /* file system state: 0xcb096f43 means clean */
 };
 
 /*
@@ -318,9 +321,9 @@ u_long sysv_count_free_blocks(struct super_block* sb);
 u_long sysv_count_free_inodes(struct super_block* sb);
 
 struct sysv_dinode* sysv_raw_inode(struct super_block* sb, ino_t ino,
-                                   struct buffer_head* bh);
+				   struct buffer_head* bh);
 int sysv_next_direntry(struct inode* dp, struct unixfs_dirbuf* dirbuf,
-                       off_t* offset, struct unixfs_direntry* dent);
+		       off_t* offset, struct unixfs_direntry* dent);
 
 int sysv_get_block(struct inode* ip, sector_t block, off_t* result);
 int sysv_get_page(struct inode* ip, sector_t index, char* pagebuf);

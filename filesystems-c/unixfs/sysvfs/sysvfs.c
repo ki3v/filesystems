@@ -163,10 +163,11 @@ detect_sysv(struct sysv_sb_info* sbi, struct buffer_head* bh)
 {
     struct super_block *sb = sbi->s_sb;
     /* All relevant fields are at the same offsets in SVR2 and SVR4 */
-    struct sysv4_super_block* sbd;
+    struct sysv2_super_block* sbd; // HACK: pl;exus force SVR2
     u32 type;
 
-    sbd = (struct sysv4_super_block*) (bh->b_data + BLOCK_SIZE/2);
+//     sbd = (struct sysv2_super_block*) (bh->b_data + BLOCK_SIZE/2);
+    sbd = (struct sysv2_super_block*) (bh->b_data); //  HACK: plexus - plexus puts sb at slice offset 1024
     if (*(__le32*)&sbd->s_magic == cpu_to_le32(0xfd187e20))
         sbi->s_bytesex = UNIXFS_FS_LITTLE;
     else if (*(__be32*)&sbd->s_magic == cpu_to_be32(0xfd187e20))
@@ -176,16 +177,23 @@ detect_sysv(struct sysv_sb_info* sbi, struct buffer_head* bh)
 
     type = fs32_to_host(sbi->s_bytesex, sbd->s_type);
  
-     if (fs16_to_host(sbi->s_bytesex, sbd->s_nfree) == 0xffff) {
-         sbi->s_type = FSTYPE_AFS;
-         sbi->s_forced_ro = 1;
-         if (!(sb->s_flags & MS_RDONLY)) {
-             printk("SysV FS: SCO EAFS detected, " 
-                 "forcing read-only mode.\n");
-         }
-         return type;
-     }
+    //  if (fs16_to_host(sbi->s_bytesex, sbd->s_nfree) == 0xffff) {
+    //      sbi->s_type = FSTYPE_AFS;
+    //      sbi->s_forced_ro = 1;
+    //      if (!(sb->s_flags & MS_RDONLY)) {
+    //          printk("SysV FS: SCO EAFS detected, " 
+    //              "forcing read-only mode.\n");
+    //      }
+    //      return type;
+    //  }
+
+    // XXX: plexus - the above commented code is obnoxious.
  
+    sbi->s_type = FSTYPE_SYSV2;			// HACK: plexus force SVR2
+    printk( "on-disk type: %d\n", type );	// HACK: plexus force SVR2
+    return 2;					// HACK: plexus force 1024-byte blocks
+
+
     if (fs32_to_host(sbi->s_bytesex, sbd->s_time) < JAN_1_1980) {
         /* this is likely to happen on SystemV2 FS */
         if (type > 3 || type < 1)
@@ -242,12 +250,15 @@ static struct {
     int block;
     int (*test)(struct sysv_sb_info*, struct buffer_head*);
 } flavours[] = {
-    { 1,  detect_xenix    },
-    { 0,  detect_sysv     },
-    { 0,  detect_coherent },
-    { 9,  detect_sysv_odd },
-    { 15, detect_sysv_odd },
-    { 18, detect_sysv     },
+//     { 1,  detect_xenix    },	// HACK: plexus - must be here so the sysv tests succedd on plexus?
+    { 0,  detect_sysv     },	// HACK: plexus
+    { 1,  detect_sysv     },	// HACK: plexus
+    { 2,  detect_sysv     },	// HACK: plexus
+    { 3,  detect_sysv     },	// HACK: plexus
+//     { 0,  detect_coherent },
+//     { 9,  detect_sysv_odd },
+//     { 15, detect_sysv_odd },
+//     { 18, detect_sysv     },
 };
 
 static char *flavour_names[] = {
@@ -449,6 +460,8 @@ sysv_count_free_blocks(struct super_block* sb)
 
     sb_count = fs32_to_host(sbi->s_bytesex, *sbi->s_free_blocks);
 
+    return sb_count; // XXX: hack
+
     if (0)
         goto trust_sb;
 
@@ -525,6 +538,8 @@ sysv_count_free_inodes(struct super_block* sb)
     struct buffer_head bh;
 
     sb_count = fs16_to_host(sbi->s_bytesex, *sbi->s_sb_total_free_inodes);
+
+    return sb_count; // HACK: plexus hack - fs will mount without this, but the warning suggests there sre still issues
 
     if (0)
         goto trust_sb;

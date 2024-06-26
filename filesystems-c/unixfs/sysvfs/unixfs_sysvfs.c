@@ -47,7 +47,8 @@ unixfs_internal_init(const char* dmg, uint32_t flags, __unused fs_endian_t fse,
     if ((err = unixfs_inodelayer_init(sizeof(struct sysv_inode_info))) != 0)
         goto out;
 
-    sb = sysv_fill_super(fd, (void*)0, 1 /* silent */);
+//     sb = sysv_fill_super(fd, (void*)0, 1 /* silent */);
+    sb = sysv_fill_super(fd, (void*)0, 0 /* silent */); // HACK: plexus - don't be silent
     if (!sb) {
         err = EINVAL;
         goto out;

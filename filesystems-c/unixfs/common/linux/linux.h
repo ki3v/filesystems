@@ -272,7 +272,7 @@ static inline void ll_rw_block(int rw, int nr, struct buffer_head* bhs[])
 #endif
 #define ADDR  BITOP_ADDR(addr)
 
-#if defined(__i386__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__) || defined(__aarch64__)
 static inline void __set_bit(int nr, volatile unsigned long *addr)
 {
     asm volatile("bts %1,%0" : ADDR : "Ir" (nr) : "memory");
@@ -344,7 +344,7 @@ extern unsigned long generic_find_next_le_bit(const unsigned long *addr,
 
 #if defined(__i386__) || defined(__ppc__)
 #define BITS_PER_LONG 32
-#elif defined(__x86_64__) || defined(__ppc64__)
+#elif defined(__x86_64__) || defined(__ppc64__) || defined(__aarch64__)
 #define BITS_PER_LONG 64
 #endif
 

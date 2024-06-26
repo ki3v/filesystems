@@ -4,7 +4,7 @@ TARGETS = hello hello_ll
 OSXFUSE_ROOT = /usr/local
 #OSXFUSE_ROOT = /opt/local
 
-INCLUDE_DIR = $(OSXFUSE_ROOT)/include/osxfuse/fuse
+INCLUDE_DIR = $(OSXFUSE_ROOT)/include/fuse
 LIBRARY_DIR = $(OSXFUSE_ROOT)/lib
 
 CC ?= gcc
@@ -16,7 +16,7 @@ CFLAGS_OSXFUSE += -D_DARWIN_USE_64_BIT_INODE
 
 CFLAGS_EXTRA = -Wall -g $(CFLAGS)
 
-LIBS = -losxfuse
+LIBS = -lfuse
 
 .c:
 	$(CC) $(CFLAGS_OSXFUSE) $(CFLAGS_EXTRA) -o $@ $< $(LIBS)

@@ -3,5 +3,6 @@
 *.d
 *.dylib
 *.o
-
+split.sh
+*.pl
 .DS_Store
